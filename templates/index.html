@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hedge Fund Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <header class="text-center mb-5">
+                    <h1 class="display-5">Hedge Fund Database Scraper</h1>
+                    <p class="lead text-muted">Scrapes the latest hedge fund letters from Buy Side Digest.</p>
+                </header>
+
+                <form action="/" method="post" class="row g-3 align-items-center justify-content-center mb-5">
+                    <div class="col-auto">
+                        <label for="num_rows" class="visually-hidden">Number of rows</label>
+                        <input type="number" class="form-control" id="num_rows" name="num_rows" placeholder="Number of rows (0 for all)">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Scrape</button>
+                    </div>
+                </form>
+
+                {% if rows_requested %}
+                    <section class="results">
+                        {% if error %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        {% elif data %}
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Scraped Data</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Fund Name</th>
+                                                <th scope="col">Letter Link</th>
+                                                <th scope="col" class="text-end">Download</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in data %}
+                                            <tr>
+                                                <td class="align-middle">{{ row['Fund Name'] }}</td>
+                                                <td class="align-middle">
+                                                    {% if row['Letter Link'] != 'N/A' %}
+                                                        <a href="{{ row['Letter Link'] }}" target="_blank" class="text-break">{{ row['Letter Link'] }}</a>
+                                                    {% else %}
+                                                        <span class="text-muted">No link available</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end align-middle">
+                                                    {% if row['Download Link'] != 'N/A' %}
+                                                        <a href="{{ url_for('download_file', url=row['Download Link'], fund_name=row['Fund Name']) }}" class="btn btn-outline-secondary btn-sm">
+                                                            Download
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">
+                                No data was returned.
+                            </div>
+                        {% endif %}
+                    </section>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
