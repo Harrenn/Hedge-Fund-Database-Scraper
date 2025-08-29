@@ -10,7 +10,7 @@
 <body>
     <main class="container my-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
+            <div class="col-lg-10 col-md-12">
                 <header class="text-center mb-5">
                     <h1 class="display-5">Hedge Fund Database Scraper</h1>
                     <p class="lead text-muted">Scrapes the latest hedge fund letters from Buy Side Digest.</p>
@@ -42,6 +42,7 @@
                                         <thead>
                                             <tr>
                                                 <th scope="col">Fund Name</th>
+                                                <th scope="col">Tickers</th>
                                                 <th scope="col">Letter Link</th>
                                                 <th scope="col" class="text-end">Download</th>
                                             </tr>
@@ -50,6 +51,7 @@
                                             {% for row in data %}
                                             <tr>
                                                 <td class="align-middle">{{ row['Fund Name'] }}</td>
+                                                <td class="align-middle">{{ row['Tickers'] }}</td>
                                                 <td class="align-middle">
                                                     {% if row['Letter Link'] != 'N/A' %}
                                                         <a href="{{ row['Letter Link'] }}" target="_blank" class="text-break">{{ row['Letter Link'] }}</a>

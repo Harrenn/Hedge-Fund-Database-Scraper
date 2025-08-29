@@ -31,11 +31,14 @@ def scrape_hedge_funds(url, num_rows):
     table = soup.find('table', id='md-fund-letter-table')
 
     if not table:
+        print("Error: Could not find the table with ID 'md-fund-letter-table'.")
         return None
 
+    # Use find_all on the table object directly, looking for the specific row class
     rows = table.find_all('tr', class_='md-fund-table-row')
     
     if not rows:
+        print("Error: Could not find any table rows with class 'md-fund-table-row'.")
         return None
 
     if num_rows > 0:
@@ -46,13 +49,25 @@ def scrape_hedge_funds(url, num_rows):
     fund_data = []
     for row in rows_to_process:
         cells = row.find_all('td')
-        if len(cells) > 8:
-            fund_name = cells[1].get_text(strip=True)
+        # Check if the row has the expected number of columns (at least 9)
+        if len(cells) >= 9:
+            # Fund Name is in the 3rd column (index 2)
+            fund_name_cell = cells[2]
+            fund_name_tag = fund_name_cell.find('a')
+            fund_name = fund_name_tag.get_text(strip=True) if fund_name_tag else 'N/A'
+            
+            # Tickers are in the 6th column (index 5)
+            tickers_cell = cells[5]
+            tickers = tickers_cell.get_text(strip=True, separator=' ')
+            
+            # Letter Link is in the last column (index 8)
             letter_cell = cells[8]
             letter_link_tag = letter_cell.find('a')
             letter_link = letter_link_tag['href'] if letter_link_tag else 'N/A'
+            
             fund_data.append({
                 'Fund Name': fund_name.replace("'", ""),
+                'Tickers': tickers,
                 'Letter Link': letter_link,
                 'Download Link': letter_link
             })
@@ -99,4 +114,6 @@ def download_file():
         return f"Error: Could not download file. {e}", 400
 
 if __name__ == '__main__':
+    # Note: You'll need to create a 'templates' folder with an 'index.html' file for this Flask app to work.
     app.run(debug=True)
+
